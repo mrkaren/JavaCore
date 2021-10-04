@@ -6,6 +6,7 @@ public class CharDemo {
         char c = 'Y';
         int a = 10;
         int b = c + a;
+
         System.out.println("Poxos");
 
         char x;
