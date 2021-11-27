@@ -50,4 +50,15 @@ public class AuthorStorage {
         }
         return null;
     }
+
+
+    public void delete(Author author) {
+        for (int i = 0; i < size; i++) {
+            if (authors[i].equals(author)) {
+                ArrayUtil.deleteByIndex(authors, i, size);
+                size--;
+                break;
+            }
+        }
+    }
 }
