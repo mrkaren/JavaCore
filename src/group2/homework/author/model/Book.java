@@ -1,4 +1,4 @@
-package group2.homework.author;
+package group2.homework.author.model;
 
 public class Book {
 
