@@ -1,5 +1,6 @@
 package group2.homework.author;
 
+import group2.homework.author.exception.BookNotFoundException;
 import group2.homework.author.model.Author;
 import group2.homework.author.model.Book;
 import group2.homework.author.model.User;
@@ -19,7 +20,7 @@ public class AuthorBookTest implements AuthorBookCommands {
     static BookStorage bookStorage = new BookStorage();
     static UserStorage userStorage = new UserStorage();
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) {
         initData();
         boolean isRun = true;
 
@@ -219,8 +220,9 @@ public class AuthorBookTest implements AuthorBookCommands {
         bookStorage.print();
         System.out.println("--------");
         String serialId = scanner.nextLine();
-        Book book = bookStorage.getBySerialId(serialId);
-        if (book != null) {
+        Book book = null;
+        try {
+            book = bookStorage.getBySerialId(serialId);
             System.out.println("please input tags separate ,");
             String tagsStr = scanner.nextLine();
             String[] tagsToRemove = tagsStr.split(",");
@@ -258,7 +260,10 @@ public class AuthorBookTest implements AuthorBookCommands {
                 book.setTags(newTags);
 
             }
+        } catch (BookNotFoundException e) {
+            System.out.println(e.getMessage());
         }
+
     }
 
     private static void addTagsToBook() {
@@ -267,8 +272,9 @@ public class AuthorBookTest implements AuthorBookCommands {
         bookStorage.print();
         System.out.println("--------");
         String serialId = scanner.nextLine();
-        Book book = bookStorage.getBySerialId(serialId);
-        if (book != null) {
+        Book book = null;
+        try {
+            book = bookStorage.getBySerialId(serialId);
             System.out.println("please input tags separate ,");
             String tagsStr = scanner.nextLine();
             String[] tags = tagsStr.split(",");
@@ -291,19 +297,27 @@ public class AuthorBookTest implements AuthorBookCommands {
                 book.setTags(newTags);
                 System.out.println("Tags were added!");
             }
+        } catch (BookNotFoundException e) {
+            System.out.println(e.getMessage());
         }
+
     }
 
-    private static void initData() throws ParseException {
-        Author author = new Author("poxos", "poxosyan", 22, "poxos@mail.com", "male", DateUtil.stringToDate("12/05/1995"));
-        Author author1 = new Author("poxosuhi", "poxosyan", 23, "poxosuhi@mail.com", "female", DateUtil.stringToDate("12/05/1997"));
-        Author author2 = new Author("petros", "petrosyan", 25, "petros@mail.com", "male", DateUtil.stringToDate("12/05/1999"));
-        authorStorage.add(author);
-        authorStorage.add(author1);
-        authorStorage.add(author2);
-        Author[] authors = {author1, author2};
-        String[] tags = {"new", "popular", "detektiv", "lav girq"};
-        bookStorage.add(new Book("AR5555", "girq1", "desc", 33, 1, authors, tags));
+    private static void initData() {
+        try {
+            Author author = new Author("poxos", "poxosyan", 22, "poxos@mail.com", "male", DateUtil.stringToDate("12/05/1995"));
+            Author author1 = new Author("poxosuhi", "poxosyan", 23, "poxosuhi@mail.com", "female", DateUtil.stringToDate("12/05/1997"));
+            Author author2 = new Author("petros", "petrosyan", 25, "petros@mail.com", "male", DateUtil.stringToDate("12/05/1999"));
+            authorStorage.add(author);
+            authorStorage.add(author1);
+            authorStorage.add(author2);
+            Author[] authors = {author1, author2};
+            String[] tags = {"new", "popular", "detektiv", "lav girq"};
+            bookStorage.add(new Book("AR5555", "girq1", "desc", 33, 1, authors, tags));
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -325,12 +339,14 @@ public class AuthorBookTest implements AuthorBookCommands {
         bookStorage.print();
         System.out.println("--------");
         String serialId = scanner.nextLine();
-        Book book = bookStorage.getBySerialId(serialId);
-        if (book != null) {
+        Book book = null;
+        try {
+            book = bookStorage.getBySerialId(serialId);
             bookStorage.delete(book);
-        } else {
-            System.err.println("Book with serial Id does not exists");
+        } catch (BookNotFoundException e) {
+            System.out.println(e.getMessage());
         }
+
     }
 
     private static void deleteAuthor() {
@@ -358,9 +374,9 @@ public class AuthorBookTest implements AuthorBookCommands {
         bookStorage.print();
         System.out.println("--------");
         String serialId = scanner.nextLine();
-        Book book = bookStorage.getBySerialId(serialId);
-        if (book != null) {
-
+        Book book = null;
+        try {
+            book = bookStorage.getBySerialId(serialId);
             printAuthorsList();
             String emails = scanner.nextLine();
             String[] emailArray = emails.split(",");
@@ -380,8 +396,8 @@ public class AuthorBookTest implements AuthorBookCommands {
                 }
             }
             book.setAuthors(authors);
-        } else {
-            System.err.println("Book with serial Id does not exists");
+        } catch (BookNotFoundException e) {
+            System.out.println(e.getMessage());
         }
 
     }
@@ -457,7 +473,11 @@ public class AuthorBookTest implements AuthorBookCommands {
         }
         System.out.println("please input book's serialId");
         String serialId = scanner.nextLine();
-        if (bookStorage.getBySerialId(serialId) == null) {
+
+        try {
+            bookStorage.getBySerialId(serialId);
+            System.out.println("Book is duplicate");
+        } catch (BookNotFoundException e) {
             System.out.println("please input book's title");
             String title = scanner.nextLine();
             System.out.println("please input book's description");
@@ -475,8 +495,7 @@ public class AuthorBookTest implements AuthorBookCommands {
             bookStorage.add(book);
 
             System.out.println("Thank you, Book was added");
-        } else {
-            System.err.println("Book with SerialID: " + serialId + " is exists");
+
         }
     }
 

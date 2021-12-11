@@ -1,5 +1,6 @@
 package group2.homework.author.storage;
 
+import group2.homework.author.exception.BookNotFoundException;
 import group2.homework.author.util.ArrayUtil;
 import group2.homework.author.model.Author;
 import group2.homework.author.model.Book;
@@ -28,13 +29,13 @@ public class BookStorage {
         }
     }
 
-    public Book getBySerialId(String serialId) {
+    public Book getBySerialId(String serialId) throws BookNotFoundException {
         for (int i = 0; i < size; i++) {
             if (books[i].getSerialId().equals(serialId)) {
                 return books[i];
             }
         }
-        return null;
+        throw new BookNotFoundException("Book does not exists. serialId: " + serialId);
     }
 
     public void searchByTitle(String keyword) {
