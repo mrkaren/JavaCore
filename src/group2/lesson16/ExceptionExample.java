@@ -4,7 +4,7 @@ import group2.lesson14.Student;
 
 public class ExceptionExample {
 
-    public static void main(String[] args) {
+    public static void main(String[] args)  {
 //        int d, a;
 //
 //        try {
@@ -25,13 +25,24 @@ public class ExceptionExample {
 //
 //            System.out.println(number);
 //        }
+//
+//        try {
+//            meth1(0);
+//        } catch (MyException e) {
+//            e.printStackTrace();
+//        }
+
 
         try {
-            meth1(0);
+            meth1(4);
         } catch (MyException e) {
             e.printStackTrace();
         }
 
+    }
+
+    static String meth2(String name) {
+        return name.trim();
     }
 
     static void meth1(int a) throws MyException {

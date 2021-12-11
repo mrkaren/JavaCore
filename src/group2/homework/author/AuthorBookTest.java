@@ -2,8 +2,10 @@ package group2.homework.author;
 
 import group2.homework.author.model.Author;
 import group2.homework.author.model.Book;
+import group2.homework.author.model.User;
 import group2.homework.author.storage.AuthorStorage;
 import group2.homework.author.storage.BookStorage;
+import group2.homework.author.storage.UserStorage;
 import group2.homework.author.util.DateUtil;
 
 import java.text.ParseException;
@@ -15,16 +17,142 @@ public class AuthorBookTest implements AuthorBookCommands {
     static Scanner scanner = new Scanner(System.in);
     static AuthorStorage authorStorage = new AuthorStorage();
     static BookStorage bookStorage = new BookStorage();
+    static UserStorage userStorage = new UserStorage();
 
     public static void main(String[] args) throws ParseException {
         initData();
         boolean isRun = true;
+
         while (isRun) {
             AuthorBookCommands.printCommands();
             String command = scanner.nextLine();
             switch (command) {
                 case EXIT:
                     isRun = false;
+                    break;
+                case LOGIN:
+                    login();
+                    break;
+                case REGISTER:
+                    register();
+                    break;
+                default:
+                    System.out.println("Invalid command!");
+            }
+        }
+    }
+
+    private static void login() {
+        System.out.println("please input email");
+        String email = scanner.nextLine();
+        User byEmail = userStorage.getByEmail(email);
+        if (byEmail != null) {
+            System.out.println("please input password");
+            String password = scanner.nextLine();
+            if (byEmail.getPassword().equals(password)) {
+                if (byEmail.getType().equalsIgnoreCase("ADMIN")) {
+                    adminLogin();
+                } else if (byEmail.getType().equalsIgnoreCase("USER")) {
+                    userLogin();
+                }
+            } else {
+                System.out.println("password is wrong!");
+            }
+        } else {
+            System.err.println("user with " + email + " does not exists");
+
+        }
+    }
+
+    private static void userLogin() {
+        boolean isRun = true;
+        while (isRun) {
+            AuthorBookCommands.printUserCommands();
+            String command = scanner.nextLine();
+            switch (command) {
+                case EXIT:
+                    System.exit(0);
+                    break;
+                case ADD_AUTHOR:
+                    addAuthor();
+                    break;
+                case ADD_BOOK:
+                    addBook();
+                    break;
+                case SEARCH_AUTHORS:
+                    searchByName();
+                    break;
+                case SEARCH_AUTHORS_BY_AGE:
+                    searchByAge();
+                    break;
+                case SEARCH_BOOKS_BY_TITLE:
+                    searchBooksByTitle();
+                    break;
+                case PRINT_AUTHORS:
+                    authorStorage.print();
+                    break;
+                case PRINT_BOOKS:
+                    bookStorage.print();
+                    break;
+                case SEARCH_BOOKS_BY_AUTHOR:
+                    searchBooksByAuthor();
+                    break;
+                case COUNT_BOOKS_BY_AUTHOR:
+                    countBooksByAuthor();
+                    break;
+                case LOGOUT:
+                    isRun = false;
+                    break;
+                default:
+                    System.out.println("Invalid command!");
+            }
+        }
+
+    }
+
+    private static void register() {
+        System.out.println("please input email");
+        String email = scanner.nextLine();
+        User byEmail = userStorage.getByEmail(email);
+        if (byEmail == null) {
+            System.out.println("Please input name");
+            String name = scanner.nextLine();
+
+            System.out.println("Please input surname");
+            String surname = scanner.nextLine();
+
+            System.out.println("Please input password");
+            String password = scanner.nextLine();
+
+            System.out.println("Please input type(ADMIN,USER)");
+            String type = scanner.nextLine();
+            if (type.equalsIgnoreCase("admin")
+                    || type.equalsIgnoreCase("user")) {
+                User user = new User();
+                user.setEmail(email);
+                user.setName(name);
+                user.setSurname(surname);
+                user.setPassword(password);
+                user.setType(type.toUpperCase());
+                userStorage.add(user);
+                System.out.println("User was registered!");
+            } else {
+                System.out.println("Invalid type");
+            }
+        } else {
+            System.err.println("user with " + email + " already exists");
+        }
+    }
+
+
+    private static void adminLogin() {
+        boolean isRun = true;
+        while (isRun) {
+            AuthorBookCommands.printAdminCommands();
+            String command = scanner.nextLine();
+            switch (command) {
+                case EXIT:
+                    System.exit(0);
                     break;
                 case ADD_AUTHOR:
                     addAuthor();
@@ -74,11 +202,15 @@ public class AuthorBookTest implements AuthorBookCommands {
                 case REMOVE_TAGS_FROM_BOOK:
                     removeTagsToBook();
                     break;
+                case LOGOUT:
+                    isRun = false;
+                    break;
                 default:
                     System.out.println("Invalid command!");
             }
 
         }
+
     }
 
     private static void removeTagsToBook() {
@@ -364,13 +496,19 @@ public class AuthorBookTest implements AuthorBookCommands {
         authorStorage.searchByName(keyword);
     }
 
-    private static void addAuthor() throws ParseException {
+    private static void addAuthor() {
         System.out.println("please input author's name,surname,email,gender,age,dateOfBirth[12/12/2021]");
         String authorDataStr = scanner.nextLine();
         String[] authorData = authorDataStr.split(",");
         if (authorData.length == 6) {
             int age = Integer.parseInt(authorData[4]);
-            Date date = DateUtil.stringToDate(authorData[5]);
+            Date date;
+            try {
+                date = DateUtil.stringToDate(authorData[5]);
+            } catch (ParseException e) {
+                System.out.println("invalid date format, please respect this format [12/12/2021]");
+                return;
+            }
             Author author = new Author(authorData[0], authorData[1], age, authorData[2], authorData[3], date);
 
             if (authorStorage.getByEmail(author.getEmail()) != null) {
