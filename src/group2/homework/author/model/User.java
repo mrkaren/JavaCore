@@ -6,9 +6,9 @@ public class User {
     private String surname;
     private String email;
     private String password;
-    private String type;
+    private UserType type;
 
-    public User(String name, String surname, String email, String password, String type) {
+    public User(String name, String surname, String email, String password, UserType type) {
         this.name = name;
         this.surname = surname;
         this.email = email;
@@ -51,11 +51,11 @@ public class User {
         this.password = password;
     }
 
-    public String getType() {
+    public UserType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(UserType type) {
         this.type = type;
     }
 

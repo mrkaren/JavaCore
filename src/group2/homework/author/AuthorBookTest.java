@@ -1,9 +1,7 @@
 package group2.homework.author;
 
 import group2.homework.author.exception.BookNotFoundException;
-import group2.homework.author.model.Author;
-import group2.homework.author.model.Book;
-import group2.homework.author.model.User;
+import group2.homework.author.model.*;
 import group2.homework.author.storage.AuthorStorage;
 import group2.homework.author.storage.BookStorage;
 import group2.homework.author.storage.UserStorage;
@@ -51,9 +49,9 @@ public class AuthorBookTest implements AuthorBookCommands {
             System.out.println("please input password");
             String password = scanner.nextLine();
             if (byEmail.getPassword().equals(password)) {
-                if (byEmail.getType().equalsIgnoreCase("ADMIN")) {
+                if (byEmail.getType() == UserType.ADMIN) {
                     adminLogin();
-                } else if (byEmail.getType().equalsIgnoreCase("USER")) {
+                } else if (byEmail.getType() == UserType.USER) {
                     userLogin();
                 }
             } else {
@@ -127,19 +125,14 @@ public class AuthorBookTest implements AuthorBookCommands {
 
             System.out.println("Please input type(ADMIN,USER)");
             String type = scanner.nextLine();
-            if (type.equalsIgnoreCase("admin")
-                    || type.equalsIgnoreCase("user")) {
-                User user = new User();
-                user.setEmail(email);
-                user.setName(name);
-                user.setSurname(surname);
-                user.setPassword(password);
-                user.setType(type.toUpperCase());
-                userStorage.add(user);
-                System.out.println("User was registered!");
-            } else {
-                System.out.println("Invalid type");
-            }
+            User user = new User();
+            user.setEmail(email);
+            user.setName(name);
+            user.setSurname(surname);
+            user.setPassword(password);
+            user.setType(UserType.valueOf(type.toUpperCase()));
+            userStorage.add(user);
+            System.out.println("User was registered!");
         } else {
             System.err.println("user with " + email + " already exists");
         }
@@ -305,9 +298,9 @@ public class AuthorBookTest implements AuthorBookCommands {
 
     private static void initData() {
         try {
-            Author author = new Author("poxos", "poxosyan", 22, "poxos@mail.com", "male", DateUtil.stringToDate("12/05/1995"));
-            Author author1 = new Author("poxosuhi", "poxosyan", 23, "poxosuhi@mail.com", "female", DateUtil.stringToDate("12/05/1997"));
-            Author author2 = new Author("petros", "petrosyan", 25, "petros@mail.com", "male", DateUtil.stringToDate("12/05/1999"));
+            Author author = new Author("poxos", "poxosyan", 22, "poxos@mail.com", Gender.MALE, DateUtil.stringToDate("12/05/1995"));
+            Author author1 = new Author("poxosuhi", "poxosyan", 23, "poxosuhi@mail.com", Gender.FEMALE, DateUtil.stringToDate("12/05/1997"));
+            Author author2 = new Author("petros", "petrosyan", 25, "petros@mail.com", Gender.MALE, DateUtil.stringToDate("12/05/1999"));
             authorStorage.add(author);
             authorStorage.add(author1);
             authorStorage.add(author2);
@@ -412,13 +405,17 @@ public class AuthorBookTest implements AuthorBookCommands {
             System.out.println("please input author's surname");
             String surname = scanner.nextLine();
             System.out.println("please input author's gender");
-            String gender = scanner.nextLine();
-            System.out.println("please input author's age");
-            int age = Integer.parseInt(scanner.nextLine());
-            author.setName(name);
-            author.setSurname(surname);
-            author.setGender(gender);
-            author.setAge(age);
+            try {
+                Gender gender = Gender.valueOf(scanner.nextLine());
+                System.out.println("please input author's age");
+                int age = Integer.parseInt(scanner.nextLine());
+                author.setName(name);
+                author.setSurname(surname);
+                author.setGender(gender);
+                author.setAge(age);
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
         } else {
             System.err.println("Author does not exists");
         }
@@ -528,7 +525,7 @@ public class AuthorBookTest implements AuthorBookCommands {
                 System.out.println("invalid date format, please respect this format [12/12/2021]");
                 return;
             }
-            Author author = new Author(authorData[0], authorData[1], age, authorData[2], authorData[3], date);
+            Author author = new Author(authorData[0], authorData[1], age, authorData[2], Gender.valueOf(authorData[3]), date);
 
             if (authorStorage.getByEmail(author.getEmail()) != null) {
                 System.err.println("Invalid email. Author with this email already exists");
