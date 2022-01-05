@@ -2,9 +2,10 @@ package core.homework.author.model;
 
 import core.homework.author.util.DateUtil;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Author {
+public class Author implements Serializable {
 
     private String name;
     private String surname;
